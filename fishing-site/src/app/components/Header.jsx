@@ -34,7 +34,6 @@ export default function Header() {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
 
-
   const handleToggleDrawer = () => setOpen((prev) => !prev);
 
   return (
@@ -75,6 +74,7 @@ export default function Header() {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            backgroundColor: 'sidebar.main',
           },
         }}
       >
@@ -88,7 +88,7 @@ export default function Header() {
           {['Home', 'Log Catch', 'Gallery', 'About'].map((text) => (
             <ListItem key={text} disablePadding>
               <ListItemButton>
-                <ListItemText primary={text} />
+                <Typography color="white">{text}</Typography>
               </ListItemButton>
             </ListItem>
           ))}
