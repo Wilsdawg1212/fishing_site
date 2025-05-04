@@ -13,11 +13,17 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
+  Tooltip,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Image from 'next/image';
 import { styled, useTheme } from '@mui/material/styles';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import { supabase } from '@/utils/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -33,8 +39,24 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function Header() {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const router = useRouter();
 
   const handleToggleDrawer = () => setOpen((prev) => !prev);
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    handleClose();
+  };
 
   return (
     <>
@@ -60,12 +82,36 @@ export default function Header() {
               FishMan
             </Typography>
           </Box>
+          <Box>
+            <Tooltip title="Account">
+              <IconButton onClick={handleMenu} color="inherit">
+                <AccountCircle />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <MenuItem onClick={() => router.push('/profile')}>Profile</MenuItem>
+              <MenuItem onClick={handleLogout}>Log Out</MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
       </AppBar>
 
       {/* Persistent Drawer */}
       <Drawer
-        variant="persistent"
+        variant="temporary"
+        ModalProps={{ keepMounted: true }}
         anchor="left"
         open={open}
         sx={{

@@ -1,16 +1,28 @@
 'use client';
 
-import { Box, Button, TextField, Typography, Container } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
 import { useState } from 'react';
+import { supabase } from '@/utils/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Call Supabase sign-up API here
-    console.log('Sign Up with:', email, password);
+    setError('');
+
+    const { error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+        setError(error.message);
+    } else {
+        router.push('/login');
+    }
+
   };
 
   return (
