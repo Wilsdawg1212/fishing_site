@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Container, TextField, Button, Typography, Box, InputLabel, Alert } from '@mui/material';
-import { supabase } from '@/utils/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 
 export default function LogCatchPage() {
   const [species, setSpecies] = useState('');
@@ -13,58 +13,67 @@ export default function LogCatchPage() {
   const [caughtAt, setCaughtAt] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const supabase = useSupabaseClient(); // gives access to session-aware client
+  const user = useUser(); // gets current user object
+
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    // Use session-aware Supabase and auth-helpers
     if (!user) {
       setError('You must be logged in to log a catch.');
       return;
     }
 
-    let image_url = null;
+    console.log(user)
+    let imageUrl = null;
 
+    // 🔽 Upload image to Supabase Storage bucket "fish"
     if (imageFile) {
       const fileExt = imageFile.name.split('.').pop();
-      const fileName = '${user.id}-${Date.now()}.${fileExt}';
-      const { data, error: uploadError } = await supabase.storage
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = fileName;
+
+      const { error: uploadError } = await supabase.storage
         .from('fish')
-        .upload(fileName, imageFile);
+        .upload(filePath, imageFile, {
+          cacheControl: '3600',
+          upsert: true,
+        });
 
       if (uploadError) {
-        setError('Image upload failed');
+        console.error('Upload error:', uploadError.message, uploadError);
+        setError(`Image upload failed: ${uploadError.message}`);
         return;
       }
 
-      const { data: urlData } = supabase.storage.from('catches').getPublicUrl(fileName);
-
+      const { data: urlData } = supabase.storage.from('fish').getPublicUrl(filePath);
       imageUrl = urlData.publicUrl;
     }
 
+    // 🔽 Insert the new catch into your "fish" table
     const { error: insertError } = await supabase.from('fish').insert([
-        {
+      {
         user_id: user.id,
         species,
         length: length ? parseFloat(length) : null,
         weight: weight ? parseFloat(weight) : null,
-        location: location || null,
+        location,
         caught_at: caughtAt || null,
-        image_url: imageUrl || null,
-        }
-    ])
+        image_url: imageUrl,
+      },
+    ]);
 
     if (insertError) {
-        setError(insertError.message);
-      } else {
-        router.push('/logbook');
-      }
+      console.error('Insert error:', insertError.message, insertError);
+      setError(insertError.message);
+    } else {
+      router.push('/logbook');
+    }
   };
 
   return (
@@ -119,13 +128,38 @@ export default function LogCatchPage() {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0])}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            setImageFile(file);
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+              };
+              reader.readAsDataURL(file);
+            } else {
+              setPreviewUrl(null);
+            }
+          }}
         />
 
         {error && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {error}
           </Alert>
+        )}
+
+        {previewUrl && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Image Preview
+            </Typography>
+            <img
+              src={previewUrl}
+              alt="Preview"
+              style={{ width: '100%', maxHeight: '300px', objectFit: 'contain' }}
+            />
+          </Box>
         )}
 
         <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>

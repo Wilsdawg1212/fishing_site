@@ -16,6 +16,7 @@ import {
   Tooltip,
   Menu,
   MenuItem,
+  Link,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -41,6 +42,13 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const router = useRouter();
+  const navItems = [
+    { text: 'Home', href: '/' },
+    { text: 'Log Catch', href: '/log-catch' },
+    { text: 'Gallery', href: '/gallery' },
+    { text: 'About', href: '/about' },
+    { text: 'My Logs', href: '/logbook'},
+  ];
 
   const handleToggleDrawer = () => setOpen((prev) => !prev);
 
@@ -131,9 +139,9 @@ export default function Header() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Home', 'Log Catch', 'Gallery', 'About'].map((text) => (
+          {navItems.map(( {text, href }) => (
             <ListItem key={text} disablePadding>
-              <ListItemButton>
+              <ListItemButton component={Link} href={href}>
                 <Typography color="white">{text}</Typography>
               </ListItemButton>
             </ListItem>

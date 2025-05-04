@@ -4,6 +4,8 @@ import { ThemeProvider, CssBaseline, Box, Toolbar } from '@mui/material';
 import theme from './theme/theme';
 import Head from 'next/head';
 import Header from './components/Header';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from '@/utils/supabaseClient';
 
 export default function RootLayout({ children }) {
   return (
@@ -17,15 +19,17 @@ export default function RootLayout({ children }) {
         />
       </Head>
       <body>
-        <ThemeProvider theme={theme}>
-          <Box sx={{ display: 'flex' }}>
-            <Header />
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-              <Toolbar /> {/* This offsets the AppBar height */}
-              {children}
+        <SessionContextProvider supabaseClient={supabase}>
+          <ThemeProvider theme={theme}>
+            <Box sx={{ display: 'flex' }}>
+              <Header />
+              <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                <Toolbar /> {/* This offsets the AppBar height */}
+                {children}
+              </Box>
             </Box>
-          </Box>
-        </ThemeProvider>
+          </ThemeProvider>
+        </SessionContextProvider>
       </body>
     </html>
   );
