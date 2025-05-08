@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Container, TextField, Button, Typography, Box, InputLabel, Alert } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import useTheme from '@mui/material/styles';
 
 export default function LogCatchPage() {
   const [species, setSpecies] = useState('');
@@ -18,6 +19,7 @@ export default function LogCatchPage() {
   const user = useUser(); // gets current user object
 
   const router = useRouter();
+  const useTheme = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
