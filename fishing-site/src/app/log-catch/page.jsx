@@ -1,12 +1,22 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Container, TextField, Button, Typography, Box, InputLabel, Alert } from '@mui/material';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  InputLabel,
+  Alert,
+  Paper,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
-import useTheme from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 export default function LogCatchPage() {
+  const [title, setTitle] = useState('');
   const [species, setSpecies] = useState('');
   const [length, setLength] = useState('');
   const [weight, setWeight] = useState('');
@@ -19,7 +29,7 @@ export default function LogCatchPage() {
   const user = useUser(); // gets current user object
 
   const router = useRouter();
-  const useTheme = useTheme();
+  const theme = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +41,7 @@ export default function LogCatchPage() {
       return;
     }
 
-    console.log(user)
+    console.log(user);
     let imageUrl = null;
 
     // 🔽 Upload image to Supabase Storage bucket "fish"
@@ -80,94 +90,125 @@ export default function LogCatchPage() {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Log a Catch
-      </Typography>
-
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-        <TextField
-          fullWidth
-          label="Species"
-          value={species}
-          onChange={(e) => setSpecies(e.target.value)}
-          required
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Length (inches)"
-          value={length}
-          onChange={(e) => setLength(e.target.value)}
-          type="number"
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Weight (lbs)"
-          value={weight}
-          onChange={(e) => setWeight(e.target.value)}
-          type="number"
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Date & Time"
-          type="datetime-local"
-          value={caughtAt}
-          onChange={(e) => setCaughtAt(e.target.value)}
-          margin="normal"
-          InputLabelProps={{ shrink: true }}
-        />
-        <InputLabel sx={{ mt: 2 }}>Image (optional)</InputLabel>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            setImageFile(file);
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                setPreviewUrl(reader.result);
-              };
-              reader.readAsDataURL(file);
-            } else {
-              setPreviewUrl(null);
-            }
-          }}
-        />
-
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {previewUrl && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Image Preview
+      <Paper elevation={3}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2, ml: 2, mr: 2, pt: 4, pb: 4 }}>
+          <Typography variant="h4" align="center" gutterBottom>
+            Log a Catch
+          </Typography>
+          <TextField
+            fullWidth
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Species"
+            value={species}
+            onChange={(e) => setSpecies(e.target.value)}
+            required
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Length (inches)"
+            value={length}
+            onChange={(e) => setLength(e.target.value)}
+            type="number"
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Weight (lbs)"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            type="number"
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Date & Time"
+            type="datetime-local"
+            value={caughtAt}
+            onChange={(e) => setCaughtAt(e.target.value)}
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+          />
+          <Box sx={{ mb: 2 }} align="center">
+            <Typography variant="subtitle1" gutterBottom>
+              Catch Photo
             </Typography>
-            <img
-              src={previewUrl}
-              alt="Preview"
-              style={{ width: '100%', maxHeight: '300px', objectFit: 'contain' }}
-            />
-          </Box>
-        )}
 
-        <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
-          Submit Catch
-        </Button>
-      </Box>
+            <input
+              type="file"
+              accept="image/*"
+              id="image-upload"
+              style={{ display: 'none' }}
+              ƒ
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                setImageFile(file);
+
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setPreviewUrl(reader.result);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+
+            <label htmlFor="image-upload">
+              <Button variant="contained" component="span" align="center">
+                Select Image
+              </Button>
+            </label>
+
+            {imageFile && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Selected: {imageFile.name}
+              </Typography>
+            )}
+          </Box>
+
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          {previewUrl && (
+            <Box
+              sx={{
+                mt: 2,
+                width: '100%',
+                maxHeight: 300,
+                overflow: 'hidden',
+                borderRadius: 2,
+                boxShadow: 1,
+              }}
+            >
+              <img src={previewUrl} alt="Preview" style={{ width: '100%', objectFit: 'cover' }} />
+            </Box>
+          )}
+
+          
+          <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
+            Submit Catch
+          </Button>
+        </Box>
+      </Paper>
     </Container>
   );
 }
