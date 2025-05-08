@@ -77,6 +77,7 @@ export default function LogCatchPage() {
         location,
         caught_at: caughtAt || null,
         image_url: imageUrl,
+        title: title || null,
       },
     ]);
 
@@ -100,7 +101,6 @@ export default function LogCatchPage() {
             label="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
             margin="normal"
           />
           <TextField
@@ -154,7 +154,6 @@ export default function LogCatchPage() {
               accept="image/*"
               id="image-upload"
               style={{ display: 'none' }}
-              ƒ
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 setImageFile(file);
@@ -170,7 +169,7 @@ export default function LogCatchPage() {
             />
 
             <label htmlFor="image-upload">
-              <Button variant="contained" component="span" align="center">
+              <Button variant="contained" color='secondary' component="span" align="center">
                 Select Image
               </Button>
             </label>
@@ -203,7 +202,7 @@ export default function LogCatchPage() {
             </Box>
           )}
 
-          
+
           <Button variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
             Submit Catch
           </Button>

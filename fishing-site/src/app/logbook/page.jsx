@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTheme } from '@mui/material/styles';
+import CatchCard from '../components/CatchCard';
 
 export default function LogbookPage() {
   const [catches, setCatches] = useState([]);
@@ -133,32 +134,7 @@ export default function LogbookPage() {
                     position: 'relative',
                   }}
                 >
-                  <Card sx={{ height: '100%', maxHeight: 460 }}>
-                    <Tooltip title="Delete Catch">
-                      <IconButton
-                        onClick={() => handleDelete(c.id, c.image_url)}
-                        sx={{ position: 'absolute', top: 8, right: 8 }}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={c.image_url || '/placeholder.jpg'} // 👈 fallback image
-                      alt={c.species}
-                    />
-                    <CardContent>
-                      <Typography variant="h6">{c.species}</Typography>
-                      {c.length && <Typography>Length: {c.length} in</Typography>}
-                      {c.weight && <Typography>Weight: {c.weight} lb</Typography>}
-                      {c.caught_at && (
-                        <Typography>Date: {new Date(c.caught_at).toLocaleString()}</Typography>
-                      )}
-                      <Typography>Location: {c.location}</Typography>
-                    </CardContent>
-                  </Card>
+                  <CatchCard catchData={c} onDelete={handleDelete} />
                 </Box>
               ))}
             </Box>
@@ -169,32 +145,7 @@ export default function LogbookPage() {
             <Box sx={{ flex: 1 }}>
               {catches.map((c) => (
                 <Box key={c.id} sx={{ mb: 2, position: 'relative' }}>
-                  <Card>
-                    <Tooltip title="Delete Catch">
-                      <IconButton
-                        onClick={() => handleDelete(c.id, c.image_url)}
-                        sx={{ position: 'absolute', top: 8, right: 8 }}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={c.image_url || '/placeholder.jpg'} // 👈 fallback image
-                      alt={c.species}
-                    />
-                    <CardContent>
-                      <Typography variant="h6">{c.species}</Typography>
-                      {c.length && <Typography>Length: {c.length} in</Typography>}
-                      {c.weight && <Typography>Weight: {c.weight} lb</Typography>}
-                      {c.caught_at && (
-                        <Typography>Date: {new Date(c.caught_at).toLocaleString()}</Typography>
-                      )}
-                      <Typography>Location: {c.location}</Typography>
-                    </CardContent>
-                  </Card>
+                  <CatchCard catchData={c} onDelete={handleDelete} />
                 </Box>
               ))}
             </Box>
@@ -205,32 +156,7 @@ export default function LogbookPage() {
           <>
             {catches.map((c) => (
               <Box key={c.id} sx={{ mb: 2, position: 'relative' }}>
-                <Card>
-                  <Tooltip title="Delete Catch">
-                    <IconButton
-                      onClick={() => handleDelete(c.id, c.image_url)}
-                      sx={{ position: 'absolute', top: 8, right: 8 }}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={c.image_url || '/placeholder.jpg'} // 👈 fallback image
-                    alt={c.species}
-                  />
-                  <CardContent>
-                    <Typography variant="h6">{c.species}</Typography>
-                    {c.length && <Typography>Length: {c.length} in</Typography>}
-                    {c.weight && <Typography>Weight: {c.weight} lb</Typography>}
-                    {c.caught_at && (
-                      <Typography>Date: {new Date(c.caught_at).toLocaleString()}</Typography>
-                    )}
-                    <Typography>Location: {c.location}</Typography>
-                  </CardContent>
-                </Card>
+                <CatchCard catchData={c} onDelete={handleDelete} />
               </Box>
             ))}
           </>
